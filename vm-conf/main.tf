@@ -12,14 +12,6 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-variable "machines" {
-    type = map(string)
-     default = {
-    machine1 = "vm1"
-    machine2 = "vm2"
-  }
-}
-
 resource "libvirt_pool" "ubuntu" {
   name = "ubuntu"
   type = "dir"
@@ -35,11 +27,11 @@ resource "libvirt_volume" "ubuntu-qcow2" {
 }
 
 data "template_file" "user_data" {
-  template = "${file("/home/cross/Bureau/cours_N7/s9/Projet_cloud/vm-conf/cloud-init.cfg")}"
+  template = "${file("${path.module}/cloud_init.cfg")}"
 }
 
 data "template_file" "network_config" {
-  template = "${file("/home/cross/Bureau/cours_N7/s9/Projet_cloud/vm-conf/network_config.cfg")}"
+  template = "${file("${path.module}/network_config.cfg")}"
 }
 
 # for more info about paramater check this out
@@ -56,8 +48,8 @@ resource "libvirt_cloudinit_disk" "commoninit" {
 # Create the machine
 resource "libvirt_domain" "domain-ubuntu" {
   name   = "ubuntu-terraform"
-  memory = "2048"
-  vcpu   = 2
+  memory = "512"
+  vcpu   = 1
 
   cloudinit = "${libvirt_cloudinit_disk.commoninit.id}"
 
@@ -90,4 +82,3 @@ resource "libvirt_domain" "domain-ubuntu" {
     autoport    = true
   }
 }
-
