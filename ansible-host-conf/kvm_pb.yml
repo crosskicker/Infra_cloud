@@ -1,6 +1,6 @@
 ---
 - name: Install KVM and dependencies
-  hosts: my_host
+  hosts: localhost
   become: yes
   tasks:
     - name: Update and upgrade apt packages

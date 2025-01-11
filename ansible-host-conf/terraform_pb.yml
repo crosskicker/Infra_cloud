@@ -1,6 +1,6 @@
 ---
 - name: Install Terraform and configure autocomplete
-  hosts: my_host
+  hosts: localhost
   become: true
   tasks:
     # Installer les dépendances
@@ -51,3 +51,22 @@
       shell: terraform -install-autocomplete
       args:
         executable: /bin/bash
+
+    - name: Download Terraform libvirt provider
+      get_url:
+        url: "https://github.com/dmacvicar/terraform-provider-libvirt/releases/download/v0.7.0/terraform-provider-libvirt-ubuntu-0.7.0.tar.gz"
+        dest: "/tmp/terraform-provider-libvirt-ubuntu-0.7.0.tar.gz"
+      
+    - name: Extract Terraform libvirt provider
+      unarchive:
+        src: "/tmp/terraform-provider-libvirt-ubuntu-0.7.0.tar.gz"
+        dest: "/tmp/"
+        remote_src: yes
+
+    - name: Move Terraform libvirt provider to /usr/local/bin
+      command: mv /tmp/terraform-provider-libvirt /usr/local/bin/
+
+    - name: Ensure /usr/local/bin/terraform-provider-libvirt is executable
+      file:
+        path: "/usr/local/bin/terraform-provider-libvirt"
+        mode: '0755'

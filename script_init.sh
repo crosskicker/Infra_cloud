@@ -16,12 +16,8 @@ sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install -y ansible python3 python3-pip
 
 # Configuration host Ansible
-echo "Configuring Ansible inventory..."
 cd ./ansible-host-conf
-cat <<EOF >hosts.ini
-[my_host]
-localhost ansible_connection=local ansible_user=$(whoami)
-EOF
+
 
 # Run Ansible playbooks
 echo "Running Ansible playbooks..."
