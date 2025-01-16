@@ -1,0 +1,72 @@
+---
+- name: Install Terraform and configure autocomplete
+  hosts: localhost
+  become: true
+  tasks:
+    # Installer les dépendances
+    - name: Update apt cache and install dependencies
+      apt:
+        update_cache: yes
+        name:
+          - gnupg
+          - software-properties-common
+        state: present
+
+    # Télécharger et installer la clé GPG
+    - name: Download and install HashiCorp GPG key
+      ansible.builtin.command:
+        cmd: wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor
+      register: gpg_output
+
+    - name: Save the GPG key
+      copy:
+        content: "{{ gpg_output.stdout }}"
+        dest: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+        owner: root
+        group: root
+        mode: '0644'
+
+    # Ajouter le dépôt HashiCorp
+    - name: Add HashiCorp repository
+      copy:
+        content: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+        dest: /etc/apt/sources.list.d/hashicorp.list
+        owner: root
+        group: root
+        mode: '0644'
+
+    # Mettre à jour les paquets
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    # Installer Terraform
+    - name: Install Terraform
+      apt:
+        name: terraform
+        state: present
+
+    # Configurer l'autocomplétion pour Terraform
+    - name: Configure Terraform autocomplete
+      shell: terraform -install-autocomplete
+      args:
+        executable: /bin/bash
+
+    - name: Download Terraform libvirt provider
+      get_url:
+        url: "https://github.com/dmacvicar/terraform-provider-libvirt/releases/download/v0.7.0/terraform-provider-libvirt-ubuntu-0.7.0.tar.gz"
+        dest: "/tmp/terraform-provider-libvirt-ubuntu-0.7.0.tar.gz"
+      
+    - name: Extract Terraform libvirt provider
+      unarchive:
+        src: "/tmp/terraform-provider-libvirt-ubuntu-0.7.0.tar.gz"
+        dest: "/tmp/"
+        remote_src: yes
+
+    - name: Move Terraform libvirt provider to /usr/local/bin
+      command: mv /tmp/terraform-provider-libvirt /usr/local/bin/
+
+    - name: Ensure /usr/local/bin/terraform-provider-libvirt is executable
+      file:
+        path: "/usr/local/bin/terraform-provider-libvirt"
+        mode: '0755'

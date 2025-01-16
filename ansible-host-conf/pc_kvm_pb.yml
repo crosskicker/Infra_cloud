@@ -1,0 +1,32 @@
+---
+- name: Install KVM and dependancies on pc distant
+  hosts: pc_distant
+  become: true
+  tasks:
+    - name: Update packages
+      apt:
+        update_cache: yes
+
+    - name: Install KVM and dependencies
+      apt:
+        name:
+          - qemu-kvm
+          - libvirt-daemon-system
+          - libvirt-clients
+          - bridge-utils
+          - virt-manager
+        state: present
+
+    - name: Add user in libvirt and kvm groups
+      user:
+        name: cross
+        groups:
+          - libvirt
+          - kvm
+        append: true
+
+    
+    - name: Remplacer le fichier distant
+      copy:
+        src: /etc/libvirt/qemu.conf
+        dest: /etc/libvirt/qemu.conf

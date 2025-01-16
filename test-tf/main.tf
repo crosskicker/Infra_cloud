@@ -7,9 +7,14 @@ terraform {
   }
 }
 provider "libvirt" {
+  alias = "local"
   uri = "qemu:///system"
 }
 
+provider "libvirt" {
+  alias = "remote"
+  uri   = "qemu+ssh://cross@192.168.1.177/system"
+}
 
 variable "instance1" {
   type = map
@@ -27,19 +32,13 @@ variable "instance2" {
   }
 }
 
-resource "libvirt_network" "vm_network" {
-  name = "vm_network"
-  addresses = ["10.0.1.0/24"]
-  mode = "nat"
-  dhcp {
-   enabled = false
-  }
-}
 
 module "instance1" {
   source    = "./modules/instances"
   name      = var.instance1.name
-
+  providers = {
+    libvirt = libvirt.local
+  }
 }
 
 module "instance2" {
@@ -47,5 +46,17 @@ module "instance2" {
   name      = var.instance2.name
   cpu       = var.instance2.cpu
   memory    = var.instance2.memory
+  providers = {
+    libvirt = libvirt.local
+  }
 }
 
+module "remote_instance1" {
+  source    = "./modules/instances"
+  providers = {
+    libvirt = libvirt.remote
+  }
+  name = "remote_vm1"
+  cpu  = 2
+  memory = 2048
+}

@@ -7,7 +7,13 @@ terraform {
   }
 }
 provider "libvirt" {
+  alias = "local"
   uri = "qemu:///system"
+}
+
+provider "libvirt" {
+  alias = "remote"
+  uri   = "qemu+ssh://cross@192.168.1.177/system"
 }
 data "template_file" "user_data" {
   template = file("${path.module}/cloud_init.cfg")
