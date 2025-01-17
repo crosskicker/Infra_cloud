@@ -6,8 +6,9 @@ resource "libvirt_domain" "instance" {
   cloudinit = libvirt_cloudinit_disk.commoninit.id
 
   network_interface {
-    network_name = "default"
-    wait_for_lease = "true"
+    network_name = var.net_mode
+    mac = var.mac
+    /* wait_for_lease = "true" */
   }
 
   disk {
