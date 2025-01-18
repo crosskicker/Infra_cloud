@@ -59,46 +59,31 @@
       args:
         executable: /bin/bash
 
-    - name: Add JAVA_HOME to Hadoop environment
-      hosts: all
-      become: yes
+    - name: Ensure JAVA_HOME is set in hadoop-env.sh
+      lineinfile:
+        path: "{{ hadoop_home }}/etc/hadoop/hadoop-env.sh"
+        line: "export JAVA_HOME={{ java_home }}"
+        state: present
 
-      tasks:
-        - name: Ensure JAVA_HOME is set in hadoop-env.sh
-          lineinfile:
-            path: "./hadoop-2.7.1/etc/hadoop/hadoop-env.sh"
-            line: "export JAVA_HOME={{ java_home }}"
-            state: present
+    - name: Copy XML core-site file
+      copy:
+        src: "./spark-config/core-site.xml"
+        dest: "{{ hadoop_home }}/etc/hadoop/"
+        owner: user
+        group: group
+        mode: '0644'
 
-    - name: copy XML core-site file
-      hosts: all
-      become: yes
+    - name: Replace master in fs.defaultFS property
+      xml:
+        path: "{{ hadoop_home }}/etc/hadoop/core-site.xml"
+        xpath: "/configuration/property[name='fs.defaultFS']/value"
+        value: "hdfs://{{ ansible_hostname }}:54310"
 
-      tasks:
-        - name: Copy a file to a remote machine
-          copy:
-            src: "./spark-config/core-site.xml"
-            dest: "{{ hadoop_home }}/etc/hadoop/"
-            owner: user
-            group: group
-            mode: '0644'
-
-        - name: Replace master in fs.defaultFS property
-          xml:
-            path: "{{ hadoop_home }}/etc/hadoop/core-site.xml"
-            xpath: "/configuration/property[name='fs.defaultFS']/value"
-            value: "hdfs://{{ ansible_hostname }}:54310"
-
-    - name: copy XML hdfs-site file
-      hosts: all
-      become: yes
-
-      tasks:
-        - name: Copy a file to a remote machine
-          copy:
-            src: "./spark-config/hdfs-site.xml"
-            dest: "{{ hadoop_home }}/etc/hadoop/"
-            owner: user
-            group: group
-            mode: '0644'
+    - name: Copy XML hdfs-site file
+      copy:
+        src: "./spark-config/hdfs-site.xml"
+        dest: "{{ hadoop_home }}/etc/hadoop/"
+        owner: user
+        group: group
+        mode: '0644'
 
