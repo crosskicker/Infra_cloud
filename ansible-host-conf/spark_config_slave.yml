@@ -1,6 +1,6 @@
 ---
 - name: Setup Hadoop, Spark, and JDK Environment
-  hosts: vm_master
+  hosts: all
   become: yes
 
   vars:
@@ -92,31 +92,6 @@
     #     owner: user
     #     group: group
     #     mode: '0644'
-
-    #Write slaves in Hadoop files
-
-    - name: Write slave IPs in Hadoop config files
-      local_action: copy
-      content: |
-        {% for ip in slave_ips %}
-        {{ ip }}
-        {% endfor %}
-      dest: "{{ hadoop_home }}/etc/hadoop/slaves"
-      delegate_to: localhost
-
-    #Write slaves in Spark
-
-    - name: Get the slave template for Spark
-      raw: cp ./spark-2.4.3-bin-hadoop2.7/conf/slaves.template ./spark-2.4.3-bin-hadoop2.7/conf/slaves
-
-    - name: Write slave IPs in Hadoop config files
-      local_action: copy
-      content: |
-        {% for ip in slave_ips %}
-        {{ ip }}
-        {% endfor %}
-      dest: "./spark-2.4.3-bin-hadoop2.7/conf/slaves"
-      delegate_to: localhost
 
       # Update master in spark environment
 
