@@ -1,11 +1,11 @@
 variable "name" {}
 variable "cpu" {
     type    = string
-    default = 1
+    default = 2
 }
 variable "memory" {
     type    = string
-    default = 1024
+    default = 2048
 }
 variable "mac"{}
 variable "net_mode"{}

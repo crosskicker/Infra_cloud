@@ -1,0 +1,107 @@
+---
+- name: Install KVM on pc portable
+  hosts: localhost
+  become: true
+  tasks:
+#### Installation KVM
+    - name: Update packages
+      apt:
+        update_cache: yes
+
+    - name: Install KVM and dependencies
+      apt:
+        name:
+          - qemu-kvm
+          - libvirt-daemon-system
+          - libvirt-clients
+          - bridge-utils
+          - virt-manager
+        state: present
+
+    - name: Add user in libvirt and kvm groups
+      user:
+        name: cross
+        groups:
+          - libvirt
+          - kvm
+        append: true
+    
+    - name: Copy qemu.conf
+      copy:
+        src: /home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/kvm-config/qemu.conf
+        dest: /etc/libvirt/qemu.conf
+        mode: '0600'
+
+
+#### Installation Terraform
+    - name: Install dependencies
+      apt:
+        name:
+          - gnupg
+          - software-properties-common
+        state: present
+
+    - name: Check HashiCorp GPG key
+      stat:
+        path: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+      register: gpg_key_check
+
+    - name: Add HashiCorp GPG key
+      command: |
+        wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor > /usr/share/keyrings/hashicorp-archive-keyring.gpg
+      when: not gpg_key_check.stat.exists
+
+    - name: Check if HashiCorp repository
+      command: grep -q "^deb .*/apt.releases.hashicorp.com .* main" /etc/apt/sources.list.d/hashicorp.list
+      register: repo_check
+      failed_when: false
+      changed_when: repo_check.rc != 0
+
+    - name: Add HashiCorp repository
+      command: |
+        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+        https://apt.releases.hashicorp.com $(lsb_release -cs) main" > /etc/apt/sources.list.d/hashicorp.list
+      when: repo_check.rc != 0
+
+    - name: Update apt cache after adding HashiCorp repository
+      apt:
+        update_cache: yes
+      when: repo_check.rc != 0
+
+    - name: Install Terraform
+      apt:
+        name: terraform
+        state: present
+
+    - name: Terraform autocomplete
+      shell: terraform -install-autocomplete
+      args:
+        creates: /etc/bash_completion.d/terraform
+      when: repo_check.rc != 0
+
+
+#### Create default network to stick ip to mac
+    - name: Copy default.xml
+      copy:
+        src: /home/cross/Bureau/cours_N7/s9/Projet_cloud/tf-conf/default.xml
+        dest: /tmp/default.xml
+        mode: '0777'
+
+    - name: Check default network
+      command: virsh net-info default
+      register: default_net_check
+      failed_when: false
+      changed_when: false
+
+    - name: Destroy the default network
+      command: virsh net-destroy default
+      when: default_net_check.rc == 0
+
+    - name: Define the default network from XML
+      command: virsh net-define /tmp/default.xml
+
+    - name: Start the default network
+      command: virsh net-start default
+
+    - name: Ensure the default network autostart
+      command: virsh net-autostart default

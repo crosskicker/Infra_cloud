@@ -1,0 +1,89 @@
+---
+- name: Setup Hadoop, Spark, and JDK Environment
+  hosts: all
+  become: yes
+
+  vars:
+    download_urls:
+      - url: "https://sd-160040.dedibox.fr/hagimont/software/hadoop-2.7.1.tar.gz"
+        dest: "hadoop-2.7.1.tar.gz"
+      - url: "https://sd-160040.dedibox.fr/hagimont/software/jdk-8u202-linux-x64.tar.gz"
+        dest: "jdk-8u202-linux-x64.tar.gz"
+      - url: "https://sd-160040.dedibox.fr/hagimont/software/spark-2.4.3-bin-hadoop2.7.tgz"
+        dest: "spark-2.4.3-bin-hadoop2.7.tgz"
+
+    java_home: "{{ ansible_env.PWD }}/jdk1.8.0_202"
+    hadoop_home: "{{ ansible_env.PWD }}/hadoop-2.7.1"
+    spark_home: "{{ ansible_env.PWD }}/spark-2.4.3-bin-hadoop2.7"
+
+  tasks:
+    - name: Download necessary files
+      get_url:
+        url: "{{ item.url }}"
+        dest: "{{ item.dest }}"
+      with_items: "{{ download_urls }}"
+
+    - name: Extract JDK
+      unarchive:
+        src: "jdk-8u202-linux-x64.tar.gz"
+        dest: "{{ ansible_env.PWD }}"
+        remote_src: yes
+
+    - name: Extract Hadoop
+      unarchive:
+        src: "hadoop-2.7.1.tar.gz"
+        dest: "{{ ansible_env.PWD }}"
+        remote_src: yes
+
+    - name: Extract Spark
+      unarchive:
+        src: "spark-2.4.3-bin-hadoop2.7.tgz"
+        dest: "{{ ansible_env.PWD }}"
+        remote_src: yes
+
+    - name: Set up environment variables
+      lineinfile:
+        path: "~/.bashrc"
+        line: "{{ item }}"
+        state: present
+      with_items:
+        - "export JAVA_HOME={{ java_home }}"
+        - "export PATH={{ java_home }}/bin:$PATH"
+        - "export HADOOP_HOME={{ hadoop_home }}"
+        - "export PATH={{ hadoop_home }}/bin:{{ hadoop_home }}/sbin:$PATH"
+        - "export SPARK_HOME={{ spark_home }}"
+        - "export PATH=$PATH:{{ spark_home }}/bin:{{ spark_home }}/sbin"
+
+    - name: Apply environment variables
+      shell: "source ~/.bashrc"
+      args:
+        executable: /bin/bash
+
+    - name: Ensure JAVA_HOME is set in hadoop-env.sh
+      lineinfile:
+        path: "{{ hadoop_home }}/etc/hadoop/hadoop-env.sh"
+        line: "export JAVA_HOME={{ java_home }}"
+        state: present
+
+    - name: Copy XML core-site file
+      copy:
+        src: "./spark-config/core-site.xml"
+        dest: "{{ hadoop_home }}/etc/hadoop/"
+        owner: user
+        group: group
+        mode: '0644'
+
+    - name: Replace master in fs.defaultFS property
+      xml:
+        path: "{{ hadoop_home }}/etc/hadoop/core-site.xml"
+        xpath: "/configuration/property[name='fs.defaultFS']/value"
+        value: "hdfs://{{ ansible_hostname }}:54310"
+
+    - name: Copy XML hdfs-site file
+      copy:
+        src: "./spark-config/hdfs-site.xml"
+        dest: "{{ hadoop_home }}/etc/hadoop/"
+        owner: user
+        group: group
+        mode: '0644'
+

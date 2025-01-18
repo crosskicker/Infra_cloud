@@ -7,7 +7,7 @@
 
 # Update and upgrade system packages
 echo "Updating and upgrading system packages..."
-sudo apt update && sudo apt upgrade -y
+sudo apt update
 
 # Install Ansible
 echo "Installing Ansible..."
@@ -16,19 +16,14 @@ sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install -y ansible python3 python3-pip
 
 # Configuration host Ansible
-cd ./ansible-host-conf
+#cd ./ansible-host-conf
 
 
 # Run Ansible playbooks
-echo "Running Ansible playbooks..."
-if [ -f "kvm_pb.yml" ]; then
-    ansible-playbook -i hosts.ini kvm_pb.yml
-else
-    echo "Error: kvm_pb.yml not found!"
-fi
+#echo "Running Ansible playbooks..."
+#if [ -f "kvm_pb.yml" ]; then
+#    ansible-playbook -i hosts.ini kvm_pb.yml
+#else
+#    echo "Error: kvm_pb.yml not found!"
+#fi
 
-if [ -f "terraform_pb.yml" ]; then
-    ansible-playbook -i hosts.ini terraform_pb.yml
-else
-    echo "Error: terraform_pb.yml not found!"
-fi

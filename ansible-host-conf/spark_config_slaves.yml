@@ -1,0 +1,7 @@
+---
+- name: Configurer les vm slaves
+  hosts: vm_slaves
+  become: true
+  tasks:
+    - name: Create hello.txt
+      command: touch /home/{{ ansible_user }}/hello.txt

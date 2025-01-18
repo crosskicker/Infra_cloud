@@ -13,7 +13,7 @@ provider "libvirt" {
 
 provider "libvirt" {
   alias = "remote"
-  uri   = "qemu+ssh://cross@192.168.1.169/system?no_verify=1"
+  uri   = "qemu+ssh://cross@91.169.37.232/system?no_verify=1"
 }
 
 /* si je suis connecté au réseau local (rezowifi1) : 192.168.1.169
@@ -62,7 +62,7 @@ module "instance2" {
   }
 }
 
-  module "remote_instance1" {
+module "remote_instance1" {
   source    = "./modules/instances"
   providers = {
     libvirt = libvirt.remote
@@ -71,5 +71,17 @@ module "instance2" {
   cpu  = 2
   memory = 2048
   mac= "52:54:00:AB:65:F5"
+  net_mode = "br-test"
+}
+
+module "remote_instance2" {
+  source    = "./modules/instances"
+  providers = {
+    libvirt = libvirt.remote
+  }
+  name = "remote_vm2"
+  cpu  = 2
+  memory = 2048
+  mac= "52:54:00:AE:75:F9"
   net_mode = "br-test"
 }

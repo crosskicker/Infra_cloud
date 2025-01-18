@@ -1,0 +1,100 @@
+---
+- name: Install KVM and dependancies on pc distant
+  hosts: pc_distant
+  become: true
+  tasks:
+#### Installation KVM
+    - name: Update packages
+      apt:
+        update_cache: yes
+
+    - name: Install KVM and dependencies
+      apt:
+        name:
+          - qemu-kvm
+          - libvirt-daemon-system
+          - libvirt-clients
+          - bridge-utils
+          - virt-manager
+        state: present
+
+    - name: Add user in libvirt and kvm groups
+      user:
+        name: cross
+        groups:
+          - libvirt
+          - kvm
+        append: true
+    
+    - name: Remplacer le fichier distant
+      copy:
+        src: /etc/libvirt/qemu.conf
+        dest: /etc/libvirt/qemu.conf
+
+#### Bridge creation and config
+
+    - name: Bridge creation checked
+      command: nmcli connection show br-test
+      register: bridge_check
+      failed_when: bridge_check.rc != 0
+      changed_when: false
+
+    - name: Create bridge br-test
+      command: nmcli connection add type bridge con-name br-test ifname br-test
+      when: bridge_check.rc != 0
+
+    - name: Check interface enp7s0
+      command: nmcli connection show bridge-slave-enp7s0 
+      register: slave_check
+      failed_when: slave_check.rc != 0
+      changed_when: false
+
+    - name: Attach enp7s0 to bridge
+      command: nmcli connection add type bridge-slave ifname enp7s0 master br-test
+      when: slave_check.rc != 0
+
+    - name: Ensure bridge br-test uses DHCP
+      command: nmcli connection modify br-test ipv4.method auto
+      when: bridge_check.rc == 0
+
+    - name: Bring up bridge br-test
+      command: nmcli connection up br-test
+
+    - name: Bring up bridge br-test explicitly
+      command: ip link set br-test up
+
+    - name: Restart NetworkManager
+      service:
+        name: NetworkManager
+        state: restarted
+
+    - name: Restart systemd-networkd
+      service:
+        name: systemd-networkd
+        state: restarted
+
+#### Creation br-test network for libvirt
+
+    - name: Copy br-test.xml
+      copy:
+        src: /home/cross/Bureau/cours_N7/s9/Projet_cloud/tf-conf/br-test.xml
+        dest: /home/cross/Bureau/br-test.xml
+        mode: '0644'
+
+    - name: Check br-test
+      command: virsh net-info br-test
+      register: net_check
+      failed_when: net_check.rc != 0
+      changed_when: false
+
+    - name: Define the libvirt network br-test
+      command: virsh net-define /home/cross/Bureau/br-test.xml
+      when: net_check.rc != 0
+
+    - name: Start br-test network
+      command: virsh net-start br-test
+      when: net_check.rc != 0
+
+    - name: Auto start br-test
+      command: virsh net-autostart br-test
+      when: net_check.rc != 0
