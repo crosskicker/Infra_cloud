@@ -1,6 +1,6 @@
 ---
 - name: configuration Spark
-  hosts: vm_master
+  hosts: spark_group
   vars_files:
     - variables.yml
   tasks:
@@ -9,6 +9,7 @@
       ansible.builtin.set_fact:
         ip_address: "{{ ansible_facts['default_ipv4']['address'] }}"
       changed_when: false
+      
 #### Installer hadoop
     - name: Installer curl
       become: true
