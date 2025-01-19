@@ -12,7 +12,7 @@ resource "libvirt_domain" "instance" {
   }
 
   disk {
-    volume_id = libvirt_volume.ubuntu-qcow2.id
+    volume_id = libvirt_volume.disk.id
   }
   console {
     type = "pty"

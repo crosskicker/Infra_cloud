@@ -1,0 +1,158 @@
+---
+- name: configuration Spark
+  hosts: vm_master
+  vars_files:
+    - variables.yml
+  tasks:
+#### recupérer l'ip
+    - name: Récupérer l'adresse IP de l'hôte
+      ansible.builtin.set_fact:
+        ip_address: "{{ ansible_facts['default_ipv4']['address'] }}"
+      changed_when: false
+#### Installer hadoop
+    - name: Installer curl
+      become: true
+      apt:
+        name: curl
+        state: present
+
+    - name: Télécharger Hadoop
+      get_url:
+        url: "https://sd-160040.dedibox.fr/hagimont/software/hadoop-2.7.1.tar.gz"
+        dest: /home/{{ ansible_user }}/hadoop-2.7.1.tar.gz
+
+    - name: Extraire Hadoop
+      unarchive:
+        src: /home/{{ ansible_user }}/hadoop-2.7.1.tar.gz
+        dest: /home/{{ ansible_user }}/
+        remote_src: yes
+
+    - name: Ajouter HADOOP_HOME au .bashrc
+      become: true
+      lineinfile:
+        path: /home/{{ ansible_user }}/.bashrc
+        line: "export HADOOP_HOME=/home/{{ ansible_user }}/hadoop-2.7.1"
+        state: present
+
+    - name: Ajouter PATH au .bashrc
+      become: true
+      lineinfile:
+        path: /home/{{ ansible_user }}/.bashrc
+        line: "export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH"
+        state: present
+
+
+
+#### Installation Spark
+
+    - name: Télécharger SPARK
+      get_url:
+        url: "https://sd-160040.dedibox.fr/hagimont/software/spark-2.4.3-bin-hadoop2.7.tgz"
+        dest: /home/{{ ansible_user }}/spark-2.4.3-bin-hadoop2.7.tgz
+
+    - name: Extraire SPARK
+      unarchive:
+        src: /home/{{ ansible_user }}/spark-2.4.3-bin-hadoop2.7.tgz
+        dest: /home/{{ ansible_user }}/
+        remote_src: yes
+
+    - name: Ajouter SPARK_HOME au .bashrc
+      become: true
+      lineinfile:
+        path: /home/{{ ansible_user }}/.bashrc
+        line: "export SPARK_HOME=/home/{{ ansible_user }}/spark-2.4.3-bin-hadoop2.7"
+        state: present
+
+    - name: Ajouter PATH au .bashrc
+      become: true
+      lineinfile:
+        path: /home/{{ ansible_user }}/.bashrc
+        line: "export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin"
+        state: present
+
+#### JAVA
+    - name: Java configuration
+      get_url:
+        url: "https://sd-160040.dedibox.fr/hagimont/software/jdk-8u202-linux-x64.tar.gz"
+        dest: /home/{{ ansible_user }}/jdk-8u202-linux-x64.tar.gz
+
+    - name: Extraire JAVA
+      unarchive:
+        src: /home/{{ ansible_user }}/jdk-8u202-linux-x64.tar.gz
+        dest: /home/{{ ansible_user }}/
+        remote_src: yes
+
+    - name: ajout à bashrc
+      lineinfile:
+        path: /home/{{ ansible_user }}/.bashrc
+        line: "export JAVA_HOME=/home/{{ ansible_user }}/jdk1.8.0_202"
+        state: present
+
+    - name: ajout à bashrc
+      lineinfile:
+        path: /home/{{ ansible_user }}/.bashrc
+        line: "export PATH=$JAVA_HOME/bin:$PATH"
+        state: present
+
+    - name: Charger le fichier d'environnement
+      shell: . /home/{{ ansible_user }}/.bashrc
+      ignore_errors: yes
+        
+
+#### config spark 
+    - name: Copy fichier slaves
+      copy:
+        src: /home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/spark-config/master-spark/slaves
+        dest: /home/cross/spark-2.4.3-bin-hadoop2.7/conf/slaves
+        mode: '0644'
+### master
+    - name: Copy fichier spark-env.sh
+      copy:
+        src: /home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/spark-config/master-spark/spark-env.sh
+        dest: /home/cross/spark-2.4.3-bin-hadoop2.7/conf/spark-env.sh
+        mode: '0755'
+      when: ip_address == master_spark
+
+      
+### slave1
+    - name: Copy fichier spark-env.sh
+      copy:
+        src: /home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/spark-config/slaves-spark/slave1/spark-env.sh
+        dest: /home/cross/spark-2.4.3-bin-hadoop2.7/conf/spark-env.sh
+        mode: '0755'
+      when: ip_address == slave1
+
+
+
+### slave2
+    - name: Copy fichier spark-env.sh
+      copy:
+        src: /home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/spark-config/slaves-spark/slave2/spark-env.sh
+        dest: /home/cross/spark-2.4.3-bin-hadoop2.7/conf/spark-env.sh
+        mode: '0755'
+      when: ip_address == slave2
+
+
+### slave3
+    - name: Copy fichier spark-env.sh
+      copy:
+        src: /home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/spark-config/slaves-spark/slave3/spark-env.sh
+        dest: /home/cross/spark-2.4.3-bin-hadoop2.7/conf/spark-env.sh
+        mode: '0755'
+      when: ip_address == slave3
+
+
+#### copie cle ssh (master)
+    - name: Copy fichier slaves
+      copy:
+        src: /home/cross/.ssh/id_rsa
+        dest: /home/cross/.ssh/id_rsa
+        mode: '0600'
+      when: ip_address == master_spark
+
+    - name: Copy fichier slaves
+      copy:
+        src: /home/cross/.ssh/id_rsa.pub
+        dest: /home/cross/.ssh/id_rsa.pub
+        mode: '0644'
+      when: ip_address == master_spark
