@@ -8,12 +8,12 @@
   </forward>
   <bridge name='virbr0' stp='on' delay='0'/>
   <mac address='52:54:00:72:9b:86'/>
-  <ip address='192.168.122.1' netmask='255.255.255.0'>
+  <ip address='192.168.123.1' netmask='255.255.255.0'>
     <dhcp>
-      <range start='192.168.122.2' end='192.168.122.254'/>
+      <range start='192.168.123.2' end='192.168.123.254'/>
       <host mac='52:54:00:52:70:C0' name='myvm' ip='192.168.122.170'/>
-      <host mac='52:54:00:AA:8C:03' name='instance1' ip='192.168.122.10'/>
-      <host mac='52:54:00:BA:95:E6' name='instance2' ip='192.168.122.20'/>
+      <host mac='52:54:00:AA:8C:03' name='instance1' ip='192.168.123.10'/>
+      <host mac='52:54:00:BA:95:E6' name='instance2' ip='192.168.123.20'/>
     </dhcp>
   </ip>
 </network>

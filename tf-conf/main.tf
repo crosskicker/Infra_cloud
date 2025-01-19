@@ -13,7 +13,7 @@ provider "libvirt" {
 
 provider "libvirt" {
   alias = "remote"
-  uri   = "qemu+ssh://cross@91.169.37.232/system?no_verify=1"
+  uri   = "qemu+ssh://cross@192.168.1.169/system?no_verify=1"
 }
 
 /* si je suis connecté au réseau local (rezowifi1) : 192.168.1.169
