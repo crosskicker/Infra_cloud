@@ -4,12 +4,34 @@
 
 ...
 
+## RUN project
+
+### Run the infrastructure with Terraform
+
+`cd /tf-conf`
+
+`terraform get`
+
+`terraform init`
+
+`terraform get `
+
+### Run playbook for configuration
+
+`cd ../ansible-host-conf`
+
+`sudo ansible-playbook -i hosts.ini host_pb.yml`
+
+`sudo ansible-playbook -i hosts.ini pc_distant_pb.yml`
+
+`sudo ansible-playbook -i hosts.ini spark_config_pb.yml`
+
+`sudo ansible-playbook -i hosts.ini spark_launch_pb.yml`
+
 # TODO
 
-- Rajouter l'ajout de la clé ssh sur pc physique dans le playbook de config (pc gamer)
-- creer le pont et supprimer la partie nat car toutes les vm en pont (terraform)
-- supprimer la partie default.xml des playbook
-- créer le playbook de lancement de spark
+- changer les noms des tasks
+- tester les playbook pc portable et pc2
 
 ## Configuration ( Beta )
 
