@@ -142,8 +142,16 @@
         mode: '0755'
       when: ip_address == slave3
 
+### slave1 ; slave2 ; slave3
+    - name: Copy filesample
+      copy:
+        src: "/home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/spark-config/filesample.txt"
+        dest: "/home/cross/spark-2.4.3-bin-hadoop2.7/bin/filesample.txt"
+        owner: cross
+        group: cross
+        mode: '0644'
 
-#### copie cle ssh (master)
+#### master -> copie cle ssh 
     - name: Copy fichier slaves
       copy:
         src: /home/cross/.ssh/id_rsa

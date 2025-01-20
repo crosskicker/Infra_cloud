@@ -1,6 +1,6 @@
 ---
 - name: Démarrer Spark Master
-  hosts: spark_group
+  hosts: vm_master
   vars_files:
     - variables.yml
 
@@ -27,7 +27,7 @@
 
     - name: Compiler le WordCount
       shell: |
-        /home/cross/jdk1.8.0_202/bin/javac -cp ".:home/cross/spark-2.4.3-bin-hadoop2.7/jars/spark-core_2.11-2.4.3.jar:home/cross/spark-2.4.3-bin-hadoop2.7/jars/scala-library-2.11.12.jar:/home/cross/hadoop-2.7.1/share/hadoop/common/hadoop-common-2.7.1.jar" WordCount.java
+        /home/cross/jdk1.8.0_202/bin/javac -cp ".:/home/cross/spark-2.4.3-bin-hadoop2.7/jars/spark-core_2.11-2.4.3.jar:/home/cross/spark-2.4.3-bin-hadoop2.7/jars/scala-library-2.11.12.jar:/home/cross/hadoop-2.7.1/share/hadoop/common/hadoop-common-2.7.1.jar" WordCount.java
         /home/cross/jdk1.8.0_202/bin/jar cf wc.jar *.class
         rm *.class
       args:
@@ -36,7 +36,7 @@
     - name: Copy filesample dans le bin
       copy:
         src: "/home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/spark-config/filesample.txt"
-        dest: "home/cross/spark-2.4.3-bin-hadoop2.7/bin/filesample.txt"
+        dest: "/home/cross/spark-2.4.3-bin-hadoop2.7/bin/filesample.txt"
         owner: cross
         group: cross
         mode: '0644'
@@ -48,18 +48,11 @@
         owner: cross
         group: cross
         mode: '0644'
-    
-    - name: Copier le filesample sur les noeuds esclaves dans le répertoire bin de Spark
-      copy: scp /home/cross/wordcount/filesample.txt {{ user }}@{{ item }}:{{ spark_home }}/bin/filesample.txt
-      with_items:
-        - "{{ spark_slave1 }}"
-        - "{{ spark_slave2 }}"
-        - "{{ spark_slave3 }}"
 
     - name: Lancer le jar dans le cluster spark
       shell: |
-        ./spark-submit --class WordCount --master spark://{{ spark_master }}:7077 {{ wordcount_dir }}/wc.jar {{ spark_home }}/bin/filesample.txt
+        ./spark-submit --class WordCount --master spark://{{ master_spark }}:7077 /home/cross/wordcount/wc.jar /home/cross/spark-2.4.3-bin-hadoop2.7/bin/filesample.txt
       args:
-        chdir: "{{ spark_home }}/bin"
+        chdir: "/home/cross/spark-2.4.3-bin-hadoop2.7/bin"
 
 

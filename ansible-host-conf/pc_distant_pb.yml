@@ -59,19 +59,23 @@
 
     - name: Bring up bridge br-test
       command: nmcli connection up br-test
+      when: bridge_check.rc == 0
 
     - name: Bring up bridge br-test explicitly
       command: ip link set br-test up
+      when: bridge_check.rc == 0
 
     - name: Restart NetworkManager
       service:
         name: NetworkManager
         state: restarted
+      when: bridge_check.rc == 0
 
     - name: Restart systemd-networkd
       service:
         name: systemd-networkd
         state: restarted
+      when: bridge_check.rc == 0
 
 #### Creation br-test network for libvirt
 
@@ -84,7 +88,7 @@
     - name: Check br-test
       command: virsh net-info br-test
       register: net_check
-      failed_when: net_check.rc != 0
+      failed_when: false
       changed_when: false
 
     - name: Define the libvirt network br-test
@@ -98,3 +102,12 @@
     - name: Auto start br-test
       command: virsh net-autostart br-test
       when: net_check.rc != 0
+
+#### cle ssh
+
+    - name: Copy fichier slaves
+      copy:
+        src: /home/cross/.ssh/id_rsa.pub
+        dest: /home/cross/.ssh/id_rsa.pub
+        mode: '0644'
+      

@@ -108,4 +108,74 @@
     - name: Ensure the default network autostart
       command: virsh net-autostart default
       
+#### Bridge creation and config
 
+    - name: Bridge creation checked
+      command: nmcli connection show br-test
+      register: bridge_check
+      failed_when: bridge_check.rc != 0
+      changed_when: false
+
+    - name: Create bridge br-test
+      command: nmcli connection add type bridge con-name br-test ifname br-test
+      when: bridge_check.rc != 0
+
+    - name: Check interface enp7s0
+      command: nmcli connection show bridge-slave-enx3c18a0d4cf8f
+      register: slave_check
+      failed_when: slave_check.rc != 0
+      changed_when: false
+
+    - name: Attach enp7s0 to bridge
+      command: nmcli connection add type bridge-slave ifname enx3c18a0d4cf8f master br-test
+      when: slave_check.rc != 0
+
+    - name: Ensure bridge br-test uses DHCP
+      command: nmcli connection modify br-test ipv4.method auto
+      when: bridge_check.rc == 0
+
+    - name: Bring up bridge br-test
+      command: nmcli connection up br-test
+      when: bridge_check.rc == 0
+
+    - name: Bring up bridge br-test explicitly
+      command: ip link set br-test up
+      when: bridge_check.rc == 0
+
+    - name: Restart NetworkManager
+      service:
+        name: NetworkManager
+        state: restarted
+      when: bridge_check.rc == 0
+
+    - name: Restart systemd-networkd
+      service:
+        name: systemd-networkd
+        state: restarted
+      when: bridge_check.rc == 0
+
+#### Creation br-test network for libvirt
+
+    - name: Copy br-test.xml
+      copy:
+        src: /home/cross/Bureau/cours_N7/s9/Projet_cloud/tf-conf/br-test.xml
+        dest: /home/cross/Bureau/br-test.xml
+        mode: '0644'
+
+    - name: Check br-test
+      command: virsh net-info br-test
+      register: net_check
+      failed_when: false
+      changed_when: false
+
+    - name: Define the libvirt network br-test
+      command: virsh net-define /home/cross/Bureau/br-test.xml
+      when: net_check.rc != 0
+
+    - name: Start br-test network
+      command: virsh net-start br-test
+      when: net_check.rc != 0
+
+    - name: Auto start br-test
+      command: virsh net-autostart br-test
+      when: net_check.rc != 0
