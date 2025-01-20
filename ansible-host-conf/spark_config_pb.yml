@@ -9,7 +9,7 @@
       ansible.builtin.set_fact:
         ip_address: "{{ ansible_facts['default_ipv4']['address'] }}"
       changed_when: false
-      
+
 #### Installer hadoop
     - name: Installer curl
       become: true
@@ -157,3 +157,4 @@
         dest: /home/cross/.ssh/id_rsa.pub
         mode: '0644'
       when: ip_address == master_spark
+

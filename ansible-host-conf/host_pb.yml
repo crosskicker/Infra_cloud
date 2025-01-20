@@ -99,9 +99,13 @@
 
     - name: Define the default network from XML
       command: virsh net-define /tmp/default.xml
+      when: default_net_check.rc == 0
 
     - name: Start the default network
       command: virsh net-start default
+     
 
     - name: Ensure the default network autostart
       command: virsh net-autostart default
+      
+

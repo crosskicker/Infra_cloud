@@ -68,7 +68,7 @@
 # - MKL_NUM_THREADS=1        Disable multi-threading of Intel MKL
 # - OPENBLAS_NUM_THREADS=1   Disable multi-threading of OpenBLAS
 
-export SPARK_MASTER_HOST=192.168.123.10 
+export SPARK_MASTER_HOST=192.168.1.146 
 export JAVA_HOME=/home/cross/jdk1.8.0_202
 #mettre l'ip de chaque vm
-export SPARK_LOCAL_IP=192.168.123.20
+export SPARK_LOCAL_IP=192.168.1.147

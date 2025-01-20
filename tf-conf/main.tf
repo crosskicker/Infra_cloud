@@ -24,7 +24,7 @@ variable "instance1" {
   default = {
     name = "instance1"
     mac = "52:54:00:AA:8C:03"
-    net_mode = "default"
+    net_mode = "br-test"
   }
 }
 
@@ -35,7 +35,7 @@ variable "instance2" {
     cpu       = 2
     memory    = 2048
     mac= "52:54:00:BA:95:E6"
-    net_mode = "default"
+    net_mode = "br-test"
   }
 }
 

@@ -17,6 +17,6 @@
 
 # A Spark Worker will be started on each of the machines listed below.
 cross@localhost
-cross@192.168.123.20
+cross@192.168.1.147
 cross@192.168.1.148
 cross@192.168.1.149

@@ -8,6 +8,7 @@
 
 - Rajouter l'ajout de la clé ssh sur pc physique dans le playbook de config (pc gamer)
 - creer le pont et supprimer la partie nat car toutes les vm en pont (terraform)
+- supprimer la partie default.xml des playbook
 - créer le playbook de lancement de spark
 
 ## Configuration ( Beta )
