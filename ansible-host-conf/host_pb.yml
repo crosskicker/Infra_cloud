@@ -78,35 +78,6 @@
       args:
         creates: /etc/bash_completion.d/terraform
       when: repo_check.rc != 0
-
-
-#### Create default network to stick ip to mac
-    - name: Copy default.xml
-      copy:
-        src: /home/cross/Bureau/cours_N7/s9/Projet_cloud/tf-conf/default.xml
-        dest: /tmp/default.xml
-        mode: '0777'
-
-    - name: Check default network
-      command: virsh net-info default
-      register: default_net_check
-      failed_when: false
-      changed_when: false
-
-    - name: Destroy the default network
-      command: virsh net-destroy default
-      when: default_net_check.rc == 0
-
-    - name: Define the default network from XML
-      command: virsh net-define /tmp/default.xml
-      when: default_net_check.rc == 0
-
-    - name: Start the default network
-      command: virsh net-start default
-     
-
-    - name: Ensure the default network autostart
-      command: virsh net-autostart default
       
 #### Bridge creation and config
 
