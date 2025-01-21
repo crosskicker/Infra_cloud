@@ -103,11 +103,5 @@
       command: virsh net-autostart br-test
       when: net_check.rc != 0
 
-#### cle ssh
 
-    - name: Copy fichier slaves
-      copy:
-        src: /home/cross/.ssh/id_rsa.pub
-        dest: /home/cross/.ssh/id_rsa.pub
-        mode: '0644'
       
