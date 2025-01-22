@@ -32,7 +32,7 @@
         rm *.class
       args:
         chdir: "/home/cross/wordcount"
-#### continuer le changement de variable    
+
     - name: Copy filesample dans le bin
       copy:
         src: "/home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/spark-config/filesample.txt"

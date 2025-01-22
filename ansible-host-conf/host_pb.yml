@@ -4,11 +4,11 @@
   become: true
   tasks:
 #### Installation KVM
-    - name: Update packages
+    - name: Mise à jour des paquets
       apt:
         update_cache: yes
 
-    - name: Install KVM and dependencies
+    - name: Installation KVM et dependences
       apt:
         name:
           - qemu-kvm
@@ -18,7 +18,7 @@
           - virt-manager
         state: present
 
-    - name: Add user in libvirt and kvm groups
+    - name: Ajout user dans libvirt et kvm groups
       user:
         name: cross
         groups:
@@ -34,41 +34,41 @@
 
 
 #### Installation Terraform
-    - name: Install dependencies
+    - name: Installation des dépendances
       apt:
         name:
           - gnupg
           - software-properties-common
         state: present
 
-    - name: Check HashiCorp GPG key
+    - name: Verif clé hashicorp
       stat:
         path: /usr/share/keyrings/hashicorp-archive-keyring.gpg
       register: gpg_key_check
 
-    - name: Add HashiCorp GPG key
+    - name: Ajout clé HashiCorp GPG
       command: |
         wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor > /usr/share/keyrings/hashicorp-archive-keyring.gpg
       when: not gpg_key_check.stat.exists
 
-    - name: Check if HashiCorp repository
+    - name: Verif repo Hashicorp
       command: grep -q "^deb .*/apt.releases.hashicorp.com .* main" /etc/apt/sources.list.d/hashicorp.list
       register: repo_check
       failed_when: false
       changed_when: repo_check.rc != 0
 
-    - name: Add HashiCorp repository
+    - name: Ajout repo HashiCorp 
       command: |
         echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
         https://apt.releases.hashicorp.com $(lsb_release -cs) main" > /etc/apt/sources.list.d/hashicorp.list
       when: repo_check.rc != 0
 
-    - name: Update apt cache after adding HashiCorp repository
+    - name: Mise à jour cache
       apt:
         update_cache: yes
       when: repo_check.rc != 0
 
-    - name: Install Terraform
+    - name: Installation Terraform
       apt:
         name: terraform
         state: present
@@ -81,13 +81,13 @@
       
 #### Bridge creation and config
 
-    - name: Bridge creation checked
+    - name: Verif Bridge creation
       command: nmcli connection show br-test
       register: bridge_check
       failed_when: bridge_check.rc != 0
       changed_when: false
 
-    - name: Create bridge br-test
+    - name: Creation bridge br-test
       command: nmcli connection add type bridge con-name br-test ifname br-test
       when: bridge_check.rc != 0
 
@@ -97,19 +97,19 @@
       failed_when: slave_check.rc != 0
       changed_when: false
 
-    - name: Attach enp7s0 to bridge
+    - name: Ajout enp7s0 to bridge
       command: nmcli connection add type bridge-slave ifname enx3c18a0d4cf8f master br-test
       when: slave_check.rc != 0
 
-    - name: Ensure bridge br-test uses DHCP
+    - name: Ajout config DHCP pour br-test 
       command: nmcli connection modify br-test ipv4.method auto
       when: bridge_check.rc == 0
 
-    - name: Bring up bridge br-test
+    - name: Up br-test connection
       command: nmcli connection up br-test
       when: bridge_check.rc == 0
 
-    - name: Bring up bridge br-test explicitly
+    - name: Up br-test 
       command: ip link set br-test up
       when: bridge_check.rc == 0
 
@@ -139,7 +139,7 @@
       failed_when: false
       changed_when: false
 
-    - name: Define the libvirt network br-test
+    - name: Define br-test dans libvirt
       command: virsh net-define /home/cross/Bureau/br-test.xml
       when: net_check.rc != 0
 

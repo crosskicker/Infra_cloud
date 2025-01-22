@@ -70,5 +70,4 @@
 
 export SPARK_MASTER_HOST=192.168.1.146
 export JAVA_HOME=/home/cross/jdk1.8.0_202
-#mettre l'ip de chaque vm
 export SPARK_LOCAL_IP=192.168.1.149
