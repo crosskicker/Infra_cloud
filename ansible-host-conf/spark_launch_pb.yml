@@ -49,7 +49,7 @@
         group: cross
         mode: '0644'
 
-    - name: Lancer le jar dans le cluster spark
+    - name: Run le jar dans le cluster spark
       shell: |
         ./spark-submit --class WordCount --master spark://{{ master_spark }}:7077 /home/cross/wordcount/wc.jar /home/cross/spark-2.4.3-bin-hadoop2.7/bin/filesample.txt
       args:
