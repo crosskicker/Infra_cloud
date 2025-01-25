@@ -4,7 +4,19 @@
 
 Ce projet a pour but de mettre en place une infrastructure système à base de machines virtuelles avec l’hyperviseur KVM de manière automatisé via Terraform qui permet de faire de l’Infrastructure as Code (IaC) tout en ajoutant une partie de configuration automatisée pour le déploiement et la mise en service de Spark de facon distribuée par l’intermédiaire de Ansible qui est un outil de gestion et de configuration des machines....
 
-## RUN project
+## RUN  project  Automatic
+
+`chmod +x script_init.sh`
+
+`sudo ./script_init.sh`
+
+### Don't forget
+
+destroy the project properly :
+
+`terraform destroy`
+
+## RUN project manually
 
 ### Run playbooks configuration for PC1 and PC2
 
