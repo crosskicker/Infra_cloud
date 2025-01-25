@@ -15,6 +15,10 @@ sudo apt install -y software-properties-common
 sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install -y ansible python3 python3-pip
 
+# Mettre la clé sur PC2
+#ssh-copy-id -i ~/.ssh/id_rsa.pub cross@192.168.1.169
+
+
 # Configuration host Ansible
 #cd ./ansible-host-conf
 

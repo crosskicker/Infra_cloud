@@ -39,43 +39,16 @@
       failed_when: bridge_check.rc != 0
       changed_when: false
 
-    - name: Créer br-test
-      command: nmcli connection add type bridge con-name br-test ifname br-test
+    - name: Copy bridge-pc2.sh 
+      copy:
+        src: /home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/network-config/bridge-pc2.sh
+        dest: /home/cross/bridge-pc2.sh
+        mode: '0755'
       when: bridge_check.rc != 0
 
-    - name: Check interface enp7s0
-      command: nmcli connection show bridge-slave-enp7s0 
-      register: slave_check
-      failed_when: slave_check.rc != 0
-      changed_when: false
-
-    - name: Attach enp7s0 to bridge
-      command: nmcli connection add type bridge-slave ifname enp7s0 master br-test
-      when: slave_check.rc != 0
-
-    - name: Ajout DHCP pour br-test 
-      command: nmcli connection modify br-test ipv4.method auto
-      when: bridge_check.rc == 0
-
-    - name: Up connection br-test
-      command: nmcli connection up br-test
-      when: bridge_check.rc == 0
-
-    - name: Up br-test
-      command: ip link set br-test up
-      when: bridge_check.rc == 0
-
-    - name: Restart NetworkManager
-      service:
-        name: NetworkManager
-        state: restarted
-      when: bridge_check.rc == 0
-
-    - name: Restart systemd-networkd
-      service:
-        name: systemd-networkd
-        state: restarted
-      when: bridge_check.rc == 0
+    - name: Exécuter bridge-pc2.sh
+      command: /home/cross/bridge-pc2.sh
+      when: bridge_check.rc != 0
 
 #### Creation br-test network for libvirt
 

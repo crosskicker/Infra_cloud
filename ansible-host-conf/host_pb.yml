@@ -91,39 +91,39 @@
       command: nmcli connection add type bridge con-name br-test ifname br-test
       when: bridge_check.rc != 0
 
-    - name: Check interface enp7s0
+    - name: Check interface
       command: nmcli connection show bridge-slave-enx3c18a0d4cf8f
       register: slave_check
-      failed_when: slave_check.rc != 0
+      failed_when: false
       changed_when: false
 
-    - name: Ajout enp7s0 to bridge
+    - name: Ajout interface to bridge
       command: nmcli connection add type bridge-slave ifname enx3c18a0d4cf8f master br-test
       when: slave_check.rc != 0
 
     - name: Ajout config DHCP pour br-test 
       command: nmcli connection modify br-test ipv4.method auto
-      when: bridge_check.rc == 0
+      when: slave_check.rc != 0
 
     - name: Up br-test connection
       command: nmcli connection up br-test
-      when: bridge_check.rc == 0
+      when: slave_check.rc != 0
 
     - name: Up br-test 
       command: ip link set br-test up
-      when: bridge_check.rc == 0
+      when: slave_check.rc != 0
 
     - name: Restart NetworkManager
       service:
         name: NetworkManager
         state: restarted
-      when: bridge_check.rc == 0
+      when: slave_check.rc != 0
 
     - name: Restart systemd-networkd
       service:
         name: systemd-networkd
         state: restarted
-      when: bridge_check.rc == 0
+      when: slave_check.rc != 0
 
 #### Creation br-test network for libvirt
 

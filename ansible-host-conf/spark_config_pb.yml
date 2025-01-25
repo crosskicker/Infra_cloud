@@ -71,7 +71,7 @@
         line: "export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin"
         state: present
 
-#### JAVA
+#### Installation JAVA
     - name: Java configuration
       get_url:
         url: "https://sd-160040.dedibox.fr/hagimont/software/jdk-8u202-linux-x64.tar.gz"
@@ -101,11 +101,13 @@
         
 
 #### config spark 
+### master
     - name: Copy fichier slaves
       copy:
         src: /home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/spark-config/master-spark/slaves
         dest: /home/cross/spark-2.4.3-bin-hadoop2.7/conf/slaves
         mode: '0644'
+      when: ip_address == master_spark
 
 ### master
     - name: Copy fichier spark-env.sh
@@ -124,8 +126,6 @@
         mode: '0755'
       when: ip_address == slave1
 
-
-
 ### slave2
     - name: Copy fichier spark-env.sh
       copy:
@@ -143,7 +143,7 @@
         mode: '0755'
       when: ip_address == slave3
 
-### slave1 ; slave2 ; slave3
+### master ; slave1 ; slave2 ; slave3
     - name: Copy filesample
       copy:
         src: "/home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/spark-config/filesample.txt"

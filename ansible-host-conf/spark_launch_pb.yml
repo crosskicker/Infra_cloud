@@ -33,21 +33,7 @@
       args:
         chdir: "/home/cross/wordcount"
 
-    - name: Copy filesample dans le bin
-      copy:
-        src: "/home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/spark-config/filesample.txt"
-        dest: "/home/cross/spark-2.4.3-bin-hadoop2.7/bin/filesample.txt"
-        owner: cross
-        group: cross
-        mode: '0644'
-    
-    - name: Copy filesample
-      copy:
-        src: "/home/cross/Bureau/cours_N7/s9/Projet_cloud/ansible-host-conf/spark-config/filesample.txt"
-        dest: "/home/cross/wordcount/filesample.txt"
-        owner: cross
-        group: cross
-        mode: '0644'
+
 
     - name: Run le jar dans le cluster spark
       shell: |
