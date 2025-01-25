@@ -2,7 +2,7 @@
 
 ### Overview
 
-...
+Ce projet a pour but de mettre en place une infrastructure système à base de machines virtuelles avec l’hyperviseur KVM de manière automatisé via Terraform qui permet de faire de l’Infrastructure as Code (IaC) tout en ajoutant une partie de configuration automatisée pour le déploiement et la mise en service de Spark de facon distribuée par l’intermédiaire de Ansible qui est un outil de gestion et de configuration des machines....
 
 ## RUN project
 
@@ -10,9 +10,9 @@
 
 `cd /ansible-host-conf`
 
-`sudo ansible-playbook -i hosts.ini host_pb.yml`  
+`sudo ansible-playbook -i hosts.ini host_pb.yml`
 
-`sudo ansible-playbook -i hosts.ini pc_distant_pb.yml`  
+`sudo ansible-playbook -i hosts.ini pc_distant_pb.yml`
 
 ### Run the infrastructure with Terraform
 
