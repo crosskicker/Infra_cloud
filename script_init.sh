@@ -50,10 +50,9 @@ terraform init
 terraform apply -auto-approve
 
 echo "terraform finished"
-echo "VMs Starting (45 sec waiting)"
+echo "VMs Starting (60 sec waiting)"
 
-sleep 45
-
+sleep 60
 
 
 #Lancement de la configuration de Spark
